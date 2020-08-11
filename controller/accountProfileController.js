@@ -109,16 +109,13 @@ router.delete('/deleteAccount', async function (req, res, next) {
 async function getAccountByID(datas) {
     let dataAcc = [];
     let showDataAcc = db.collection("AccountProfile").doc(datas.lineID);
-    await showDataAcc.get().then(snapshot => {
-        snapshot.forEach(doc => {
-            dataAcc.push(doc.data());
-        });
+    await showDataAcc.get().then(doc => {
+        dataAcc.push(doc.data());
     })
         .catch(err => {
-            console.log('Error getting Room: ', err);
+            console.log('Error getting AccountPorfile', err);
         });
-    //console.log('Data Account : ' + dataAcc);
-    return dataAcc
+    return dataAcc;
 };
 
 async function createAccountDetail(datas) {
