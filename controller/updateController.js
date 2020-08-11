@@ -7,6 +7,7 @@ let db = firebase.firestore()
 // POST /update (อัพเดททุกอย่าง)
 // - อัพเดทข้อมูลชื่อและรูปภาพของ user
 // - อัพเดทเมื่อ user ออกจากกลุ่ม line ไป
+// - save lineID Displayname PictureURL 
 
 router.post('/', async function (req, res, next) {
     let datas = req.body
