@@ -31,23 +31,23 @@ router.post("/", async function (req, resp) {
             var dataLine = {
                 lineID: decoded.sub,
                 displayName: decoded.name,
-                email: decoded.email,
                 pictureURL: decoded.picture
             }
-            //console.log('Data after Decode : ' + dataLine)
-
             // Check first login or not
-            if (dataLine != null) {
-                let CheckUserRegister = await db.collection('AccountProfile').where('lineID', '==', dataLine.lineID);
-                CheckUserRegister.get().then(async data => {
-                    const checkData = data.exists;
-                    if (checkData) {
+            if (dataLine.lineID != null || dataLine.lineID != undefined ||
+                dataLine.displayName != null || dataLine.displayName != undefined ||
+                dataLine.pictureURL != null || dataLine.pictureURL != undefined) {
+                console.log('check: ', dataLine.lineID)
+                let CheckUserRegister = await db.collection('AccountProfile').doc(dataLine.lineID);
+                CheckUserRegister.get().then(async datas => {
+                    if (datas.exists) {
+                        console.log('User register already')
                         var token = jwt.sign(dataLine, 'secreatKey');
-                        resp.json(token);
+                        resp.status(200).json(token);
                     } else {
-                        resp.status(400).json({
-                            message: 'You must to register account'
-                        });
+                        console.log('User first login')
+                        var token = jwt.sign(dataLine, 'secreatKey');
+                        resp.status(202).json(token)
                     }
                 })
             } else {

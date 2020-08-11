@@ -17,7 +17,8 @@ router.get('/', async function (req, res, next) {
 });
 
 router.get('/roomDetail', async function (req, res, next) {
-    let datas = req.body;
+    let datas = req.query;
+    console.log('log be: ' + datas.roomID)
     if (datas.roomID == undefined || datas.roomID == null || datas.roomID == '') {
         res.status(400).json({
             message: "The Data was empty or undefined"
@@ -207,42 +208,42 @@ async function createRoom(datas) {
                 ageCondition: datas.ageCondition,
                 status: datas.status
             })
-        } else {
-            let saveUserRef = db.collection('AccountProfile').doc(datas.lineID);
-            saveUserRef.set({
-                lineID: datas.lineID,
-                displayName: datas.displayName,
-                pictureURL: data.pictureURL,
-                fname: data.fname,
-                lname: data.lname,
-                bio: datas.bio,
-                gender: datas.gender,
-                birthday: datas.birthday,
-                phone: datas.phone,
-                rating: datas.rating
-            })
-            let saveRoomIDinAccountRef = saveUserRef.collection('Room').doc(genRoomID);
-            saveRoomIDinAccountRef.set({
-                roomID: genRoomID
-            })
-            let saveRoomID = db.collection('Room').doc(genRoomID)
-            saveRoomID.set({
-                roomID: genRoomID,
-                ownerRoomID: datas.lineID,
-                ownerRoomName: datas.displayName,
-                ownerPicRoom: datas.pictureURL,
-                roomName: datas.roomName,
-                // roomCover: datas.roomCover,
-                province: datas.province,
-                startDate: datas.startDate,
-                endDate: datas.endDate,
-                tripDetails: datas.tripDetails,
-                // qrCode: datas.qrCode,
-                maxMember: datas.maxMember,
-                genderCondition: datas.genderCondition,
-                ageCondition: datas.ageCondition,
-                status: datas.status
-            })
+            // } else {
+            //     let saveUserRef = db.collection('AccountProfile').doc(datas.lineID);
+            //     saveUserRef.update({
+            //         lineID: datas.lineID,
+            //         displayName: datas.displayName,
+            //         pictureURL: data.pictureURL,
+            //         fname: data.fname,
+            //         lname: data.lname,
+            //         bio: datas.bio,
+            //         gender: datas.gender,
+            //         birthday: datas.birthday,
+            //         phone: datas.phone,
+            //         rating: datas.rating
+            //     })
+            //     let saveRoomIDinAccountRef = saveUserRef.collection('Room').doc(genRoomID);
+            //     saveRoomIDinAccountRef.set({
+            //         roomID: genRoomID
+            //     })
+            //     let saveRoomID = db.collection('Room').doc(genRoomID)
+            //     saveRoomID.set({
+            //         roomID: genRoomID,
+            //         ownerRoomID: datas.lineID,
+            //         ownerRoomName: datas.displayName,
+            //         ownerPicRoom: datas.pictureURL,
+            //         roomName: datas.roomName,
+            //         // roomCover: datas.roomCover,
+            //         province: datas.province,
+            //         startDate: datas.startDate,
+            //         endDate: datas.endDate,
+            //         tripDetails: datas.tripDetails,
+            //         // qrCode: datas.qrCode,
+            //         maxMember: datas.maxMember,
+            //         genderCondition: datas.genderCondition,
+            //         ageCondition: datas.ageCondition,
+            //         status: datas.status
+            //     })
         }
     });
 }
@@ -255,9 +256,9 @@ async function updateRoom(datas) {
         province: datas.province,
         startDate: datas.startDate,
         endDate: datas.endDate,
-        detail: datas.detail,
+        tripDetails: datas.detail,
         // qrCode: datas.qrCode,
-        maxuser: datas.maxuser,
+        maxMember: datas.maxuser,
         genderCondition: datas.genderCondition,
         ageCondition: datas.ageCondition,
         status: datas.status
@@ -271,7 +272,8 @@ async function updateRoom(datas) {
 async function deleteRoom(datas) {
     await db.collection('AccountProfile').doc(datas.lineID).collection('Room').doc(datas.roomID).delete();
 
-    // จะลบข้อมูลของ Member ทั้งหมดใน room ?
+    // จะลบข้อมูลที่เกี่ยวกับ user คนนั้นออกให้หมดจาก DB
+    // จะลบข้อมูลของ Member ทั้งหมดใน room 
     // await db.collection('Room').doc(datas.roomID).collection('Member').doc().delete();
 
     await db.collection('Room').doc(datas.roomID).delete()

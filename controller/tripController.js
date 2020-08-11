@@ -12,7 +12,6 @@ let db = firebase.firestore();
 // DELETE /trip/deleteTrip  (ลบทริป)
 
 router.get('/', async function (req, res, next) {
-    let datas = req.body;
     let lineGroupID = req.query.lineGroupID;
     let lineID = req.query.lineID;
     if (lineGroupID == undefined || lineGroupID == null || lineGroupID == '' ||
@@ -103,7 +102,7 @@ router.post('/createTrip', async function (req, res, next) {
             message: "create trip success"
         })
     }
-});
+})
 
 router.put('/editTrip', async function (req, res, next) {
     let datas = req.body;
@@ -137,7 +136,7 @@ router.put('/editTrip', async function (req, res, next) {
     }
 });
 
-router.delete('/deleteTrip', function (req, res, next) {
+router.delete('/deleteTrip', async function (req, res, next) {
     let datas = req.body;
     if (datas.tripID == undefined || datas.tripID == null || datas.tripID == '') {
         console.log('Alert: The Data was empty or undefined"')
@@ -322,7 +321,8 @@ async function createTripList(datas) {
                 tripStatus: datas.tripStatus
             })
             let saveTripPerDay = await db.collection('TripPerDay').doc(genTripID).set({
-                tripID: genTripID
+                tripID: genTripID,
+                event: datas.event
             })
             // await saveTripPerDay.collection('Day').doc().set({
             //     eventDate: datas.eventDate,
@@ -341,7 +341,7 @@ async function createTripList(datas) {
 async function updateTrip(datas) {
     let message;
     let CheckLineChatAccountRef = await db.collection('LineChatAccount').doc(datas.lineID);
-    CheckLineChatAccountRef.get().then(data => {
+    CheckLineChatAccountRef.get().then(async data => {
         if (data.exists) {
             await CheckLineChatAccountRef.update({
                 lineID: datas.lineID,

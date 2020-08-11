@@ -12,15 +12,14 @@ let db = firebase.firestore();
 // GET : /accountProfile/roomJoin (ดูทริปที่เคยJoin)
 
 router.get('/', async function (req, res, next) {
-    let datas = req.body;
+    let datas = req.query;
     if (datas.lineID == undefined || datas.lineID == null || datas.lineID == '') {
         res.status(400).json({
             message: "The Data was empty or undefined"
         })
     } else {
-        await getAccountByID(res, datas).then(res => {
-            return res
-        })
+        let accList = await getAccountByID(datas);
+        res.status(200).json(accList);
     }
 });
 
@@ -29,11 +28,11 @@ router.post('/createAccountDetail', async function (req, res, next) {
     if (datas.lineID == undefined || datas.lineID == null || datas.lineID == '' ||
         datas.pictureURL == undefined || datas.pictureURL == null || datas.pictureURL == '' ||
         datas.displayName == undefined || datas.displayName == null || datas.displayName == '' ||
-        datas.fname == undefined || datas.fname == null || datas.fname == '' ||
-        datas.lname == undefined || datas.lname == null || datas.lname == '' ||
+        datas.fName == undefined || datas.fName == null || datas.fName == '' ||
+        datas.lName == undefined || datas.lName == null || datas.lName == '' ||
         datas.gender == undefined || datas.gender == null || datas.gender == '' ||
         datas.birthday == undefined || datas.birthday == null || datas.birthday == '' ||
-        datas.phone == undefined || datas.phone == null || datas.phone == '') {
+        datas.tel == undefined || datas.tel == null || datas.tel == '') {
         res.status(400).json({
             message: "The Data was empty or undefined"
         })
@@ -53,19 +52,18 @@ router.put('/editAccountDetail', async function (req, res, next) {
     if (datas.lineID == undefined || datas.lineID == null || datas.lineID == '' ||
         datas.pictureURL == undefined || datas.pictureURL == null || datas.pictureURL == '' ||
         datas.displayName == undefined || datas.displayName == null || datas.displayName == '' ||
-        datas.fname == undefined || datas.fname == null || datas.fname == '' ||
-        datas.lname == undefined || datas.lname == null || datas.lname == '' ||
+        datas.fName == undefined || datas.fName == null || datas.fName == '' ||
+        datas.lName == undefined || datas.lName == null || datas.lName == '' ||
         datas.gender == undefined || datas.gender == null || datas.gender == '' ||
         datas.birthday == undefined || datas.birthday == null || datas.birthday == '' ||
-        datas.phone == undefined || datas.phone == null || datas.phone == '') {
+        datas.tel == undefined || datas.tel == null || datas.tel == '') {
         res.status(400).json({
             message: "The Data was empty or undefined"
         })
     } else {
-        let CheckPermission = await db.collection('AccountProfile').where('lineID', '==', datas.lineID);
+        let CheckPermission = await db.collection('AccountProfile').doc(datas.lineID);
         CheckPermission.get().then(async data => {
-            let checkDataExists = data.exists;
-            if (checkDataExists) {
+            if (data.exists) {
                 await updateAccountDetail(datas);
                 console.log('Alert: Edit Profile Success"')
                 res.status(201).json({
@@ -91,7 +89,7 @@ router.delete('/deleteAccount', async function (req, res, next) {
         let checkPermission = await db.collection('AccountProfile').doc(data.lineID);
         checkPermission.get().then(async data => {
             if (data.exists) {
-                await deleteRoom(req.body);
+                await deleteAccount(req.body);
                 console.log('Alert: Delete Account Success')
                 res.status(200).json({
                     message: "Delete Account Success",
@@ -117,24 +115,22 @@ async function getAccountByID(datas) {
         });
     })
         .catch(err => {
-            console.log('Error getting Room', err);
+            console.log('Error getting Room: ', err);
         });
-    console.log('Data Account : ' + dataAcc);
-    return res.status(200).json(dataAcc);
+    //console.log('Data Account : ' + dataAcc);
+    return dataAcc
 };
 
 async function createAccountDetail(datas) {
     await db.collection('AccountProfile').doc(datas.lineID).set({
         lineID: datas.lineID,
         displayName: datas.displayName,
-        pictureURL: data.pictureURL,
-        fname: data.fname,
-        lname: data.lname,
-        bio: datas.bio,
+        pictureURL: datas.pictureURL,
+        fName: datas.fName,
+        lName: datas.lName,
         gender: datas.gender,
         birthday: datas.birthday,
-        phone: datas.phone,
-        rating: datas.rating
+        tel: datas.tel
     });
 }
 
@@ -143,18 +139,18 @@ async function updateAccountDetail(data) {
         lineID: datas.lineID,
         displayName: datas.displayName,
         pictureURL: data.pictureURL,
-        fname: data.fname,
-        lname: data.lname,
+        fName: data.fName,
+        lName: data.lName,
         bio: datas.bio,
         gender: datas.gender,
         birthday: datas.birthday,
-        phone: datas.phone,
+        tel: datas.tel,
         rating: datas.rating
     });
 }
 
-async function deleteRoom(data){
-
+async function deleteAccount(data) {
+    //ลบยัน Account ID ใน 'AccountPrifile' DB
 }
 
 async function getTripHistoryById(datas) {
